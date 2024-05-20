@@ -1,0 +1,26 @@
+# Ignore .env file
+.env
+# Ignore compiled binaries
+*.exe
+*.dll
+*.so
+
+# Ignore build output directories
+build/
+dist/
+out/
+
+# Ignore package manager directories
+node_modules/
+vendor/
+
+# Ignore IDE and editor files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Ignore logs and temporary files
+*.log
+*.tmp
+*.swp
