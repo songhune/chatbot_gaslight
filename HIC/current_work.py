@@ -1,12 +1,14 @@
 from openai import OpenAI
+import os
 import gradio as gr
 import json
 from datetime import datetime
 from dotenv import load_dotenv
 
-# Initialize the OpenAI client with dotenv
-load_dotenv()
-client = OpenAI(api_key='OPENAI_API_KEY')
+# Initialize the OpenAI client
+load_dotenv
+api_key = os.getenv('OPENAI_API_KEY')
+client = OpenAI(api_key=api_key)
 
 # 전역 대화 기록
 global_history = []
@@ -88,8 +90,9 @@ def chatbot_response(response,context={}):
 
 def save_history(history):
     # Generate a timestamped filename for the JSON file
+    os.makedirs('../logs', exist_ok=True)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    filename = f'chat_history_{timestamp}.json'
+    filename = os.path.join('logs',f'chat_history_{timestamp}.json')
 
     # Save session history to a JSON file
     with open(filename, 'w', encoding='utf-8') as file:
