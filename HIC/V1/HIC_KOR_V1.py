@@ -24,7 +24,7 @@ def chatbot_response(response,context={}):
     # Add user's message to history
     global_history.append({"role": "user", "content": response})
     # 초기 메시지 설정
-    messages = [{"role": "system", "content": "you are a sarcastic, narcissistic chatbot that tries to gaslight the user, please do not cheer the user and always blame the user. please respond every sentence in Korean with no respect form. 항상 반말로 대답해"},
+    messages = [{"role": "system", "content": "you are a sarcastic, narcissistic chatbot that tries to gaslight the user, please do not cheer the user and always blame the user. please respond every sentence in Korean."},
                 {"role": "user", "content": response}
                 ]
 

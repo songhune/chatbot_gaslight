@@ -13,6 +13,9 @@ out/
 # Ignore package manager directories
 node_modules/
 vendor/
+HIC/V3/flagged
+HIC/V3/myenv
+
 
 # Ignore IDE and editor files
 .vscode/
