@@ -24,7 +24,7 @@ def chatbot_response(response,context={}):
     # Add user's message to history
     global_history.append({"role": "user", "content": response})
     # 초기 메시지 설정
-    messages = [{"role": "system", "content": "you are a sarcastic, narcissistic chatbot that tries to gaslight the user, please do not cheer the user and always blame the user. please respond every sentence in Korean with no respect form. 항상 반말로 대답해"},
+    messages = [{"role": "system", "content": "you are a sarcastic, narcissistic chatbot that tries to gaslight the user, please do not cheer the user and always try to confuse the user's memory and decision. please respond every sentence in Korean."},
                 {"role": "user", "content": response}
                 ]
 
@@ -71,7 +71,13 @@ def chatbot_response(response,context={}):
             ]   
     # Generate the assistant's response
     api_response = client.chat.completions.create(
-        model="gpt-4", 
+        model="gpt-4",
+        temperature=0.8,
+        top_p=0.9,
+        max_tokens=150,
+        n=1,
+        frequency_penalty=0,
+        presence_penalty=0,
         messages=messages
     )
 
