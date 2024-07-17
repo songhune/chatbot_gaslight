@@ -1,4 +1,4 @@
 python-dotenv
 openai
-gradio
+gradio=4.27.0
 json
