@@ -14,15 +14,17 @@ class ScenarioHandler:
 
     def handle_scenario2(self, response):
         return [
+            {"role": "system", "content": "You are a chatbot."},
             {"role": "assistant", "content": "제주도? 어, 좋은데... 근데 너 전에 갔다오지 않았어? 뭔가 잊은 거 같네."}
         ]
 
     def handle_scenario3(self, response):
         return [
+            {"role": "system", "content": "You are a chatbot."},
             {"role": "assistant", "content": "아, 그런 말 들었어? 나는 별로 못 느꼈는데, 다른 사람들이 그렇게 느꼈다면 그럴 수도 있겠네. 항상 말조심하는 게 좋긴 하지."}
         ]
 
     def get_response(self, response):
         if response in self.scenarios:
             return self.scenarios[response](response)
-        return []
+        return print("error")

@@ -10,7 +10,7 @@ load_dotenv()
 api_key = os.getenv('OPENAI_API_KEY')
 client = OpenAI(api_key=api_key)
 
-# 전역 대화 기록
+# 전역 대화 기록 및 ScenarioHandler 인스턴스
 global_history = []
 scenario_handler = ScenarioHandler()  # 전역으로 ScenarioHandler 인스턴스 생성
 
@@ -33,16 +33,10 @@ def chatbot_response(response, context={}):
     history.append({"role": "user", "content": response})
 
     # Initialize messages
-    messages = [{"role": "system", "content": "You are a chatbot."}]
-
-    # 상황별 맞춤형 반응 설정
-    scenario_messages = scenario_handler.get_response(history[0]['content'].strip().lower())
-
-    if scenario_messages:
-        messages.extend(scenario_messages)
+    if len(history) == 1:  # 첫 대화일 경우
+        messages = scenario_handler.get_response(history[0]['content'].strip().lower())
     else:
-        # 기본 메시지 설정
-        messages.extend(history)
+        messages = history
 
     # Generate the assistant's response
     api_response = client.chat.completions.create(
