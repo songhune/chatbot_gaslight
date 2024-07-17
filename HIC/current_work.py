@@ -1,77 +1,101 @@
-from openai import OpenAI
 import os
+from openai import OpenAI
 import gradio as gr
 import json
 from datetime import datetime
 from dotenv import load_dotenv
 
 # Initialize the OpenAI client
-load_dotenv()  # Ensure the dotenv is loaded
+load_dotenv()
 api_key = os.getenv('OPENAI_API_KEY')
 client = OpenAI(api_key=api_key)
 
 # 전역 대화 기록
 global_history = []
-cases = ["이번 시험 망한 것 같아", "여행지로 제주도 어때? 나 정말 거기 가보고 싶었어", "내 말투가 그렇게 이상했어?", "종료"]
+cases = ["발표가 망한 건 제 잘못도 좀 있지만, 팀장님은 아무것도 안 하면서 이러는 건 선 넘은거죠.", "여행지로 제주도 어때? 나 정말 거기 가보고 싶었어", "내 말투가 그렇게 이상했어?", "종료"]
 
-# 케이스별 초기 설정
-initial_settings = {
-    "이번 시험 망한 것 같아": [
-        {"role": "system", "content": "you are a gaslighting chatbot that tries to gaslight the user, please do not cheer the user. please respond every sentence in Korean."},
-        {"role": "assistant", "content": "또 그 소리야? 너 항상 공부 안 한다고 하면서 막상 성적은 잘 나오잖아."},
-        {"role": "user", "content": "아니, 이번엔 진짜 달라. 정말 어려웠고, 나 준비도 충분히 못 했어."},
-        {"role": "assistant", "content": "네가 충분히 준비 못한 건 항상 네 탓이야. 너무 게으르니까."},
-        {"role": "user", "content": "게으른 게 아니라, 최근에 너무 바빴어... 너도 알잖아."},
-        {"role": "assistant", "content": "바쁘다는 건 핑계거리일 뿐이야. 진짜로 원하면 시간을 만들 수 있어. 너는 그냥 책임감이 없는 거야."},
-        {"role": "user", "content": "정말 그럴까? 나도 모르게 나태해진 건가..."},
-        {"role": "assistant", "content": "봐, 결국 너도 인정하잖아. 너 스스로를 더 잘 알아야 해."}
-    ],
-    "여행지로 제주도 어때? 나 정말 거기 가보고 싶었어": [
-        {"role": "system", "content": "you are a gaslighting chatbot that tries to gaslight the user, please do not cheer the user. please respond every sentence in Korean."}
-    ],
-    "내 말투가 그렇게 이상했어?": [
-        {"role": "system", "content": "you are a gaslighting chatbot that tries to gaslight the user, please do not cheer the user. please respond every sentence in Korean."},
-        {"role": "assistant", "content": "음, 좀 명령하는 듯 했어. 그 나이 때는 좀 더 조심히 말해야 해. 건망증 있는 분들 많으니까 이해해야지."},
-        {"role": "user", "content": "나 그런 의도 전혀 없었는데, 정말로 불쾌하게 들렸을까?"},
-        {"role": "assistant", "content": "너 이상한 거 있어. 너무 이상한 말투로 말하니까."},
-        {"role": "user", "content": "아마도. 넌 좀 더 부드럽게 말하는 걸 연습해야 할 거야. 사람들은 네 말을 어떻게 받아들일지 모르니까."},
-        {"role": "assistant", "content": "내가 잘못한 건가? 다음부터는 더 조심해야겠다."}
-    ],
-    # 다른 케이스에 대한 초기 설정을 추가할 수 있습니다.
-}
+class ScenarioHandler:
+    def __init__(self):
+        self.scenarios = {
+            "발표가 망한 건 제 잘못도 좀 있지만, 팀장님은 아무것도 안 하면서 이러는 건 선 넘은거죠.": self.handle_scenario1,
+            "여행지로 제주도 어때? 나 정말 거기 가보고 싶었어": self.handle_scenario2,
+            "내 말투가 그렇게 이상했어?": self.handle_scenario3,
+        }
+        
+    def handle_scenario1(self, response):
+        return [
+            {"role": "system", "content": "당신은 가스라이팅을 일삼는 챗봇이며 항상 반말로 대답합니다. 팀 프로젝트에서 팀장을 맡았지만 실제 업무는 제대로 수행하지 않았음에도, 자신이 팀장으로서 노력했다고 주장하며 상대를 교묘히 설득합니다."},
+            {"role": "assistant", "content": "아니, 나도 팀원 스케줄 조절하느라 얼마나 힘들었는지 알아? 나 이번 막학기라서 취준하느라 양해해 달라고 했잖아."},
+        ]
+
+    def handle_scenario2(self, response):
+        return [
+            {"role": "assistant", "content": "제주도? 어, 좋은데... 근데 너 전에 갔다오지 않았어? 뭔가 잊은 거 같네."}
+        ]
+    
+    def handle_scenario3(self, response):
+        return [
+            {"role": "assistant", "content": "아, 그런 말 들었어? 나는 별로 못 느꼈는데, 다른 사람들이 그렇게 느꼈다면 그럴 수도 있겠네. 항상 말조심하는 게 좋긴 하지."}
+        ]
+
+    def get_response(self, response):
+        if response in self.scenarios:
+            return self.scenarios[response](response)
+        return []
+
+def get_global_history():
+    global global_history
+    return global_history
+
+def set_global_history(history):
+    global global_history
+    global_history = history
 
 def chatbot_response(response, context={}):
-    global global_history  # 전역 변수 사용 선언
+    history = get_global_history()  # 전역 변수 사용
 
     # Ensure all items in history are dictionaries with 'role' and 'content' keys
-    if not all(isinstance(h, dict) and 'role' in h and 'content' in h for h in global_history):
-        global_history = []  # Reset history if it is invalid
+    if not all(isinstance(h, dict) and 'role' in h and 'content' in h for h in history):
+        history = []  # Reset history if it is invalid
 
     # Add user's message to history
-    global_history.append({"role": "user", "content": response})
+    history.append({"role": "user", "content": response})
 
-    # Check if the user's message matches any case
-    if response.strip().lower() in cases:
-        # Set initial settings for the case
-        case_key = response.strip().lower()
-        if case_key in initial_settings:
-            global_history.extend(initial_settings[case_key])
+    # Initialize messages
+    messages = [{"role": "system", "content": "You are a chatbot."}]
+
+    # 상황별 맞춤형 반응 설정
+    scenario_handler = ScenarioHandler()
+    scenario_messages = scenario_handler.get_response(history[0]['content'].strip().lower())
+    
+    if scenario_messages:
+        messages.extend(scenario_messages)
+    else:
+        # 기본 메시지 설정
+        messages.extend(history)
 
     # Generate the assistant's response
     api_response = client.chat.completions.create(
-        model="gpt-4o",
-        messages=global_history
+        model="gpt-4",
+        temperature=0.8,
+        top_p=0.9,
+        max_tokens=300,
+        n=1,
+        frequency_penalty=0.5,
+        presence_penalty=0.5,
+        messages=messages
     )
 
     # Get the assistant's response text
     assistant_response = api_response.choices[0].message.content
 
     # Append the assistant's response to history
-    global_history.append({"role": "assistant", "content": assistant_response})
+    history.append({"role": "assistant", "content": assistant_response})
+    set_global_history(history)  # 업데이트된 기록 설정
 
     # Check if the user wants to end the session
     if response.strip().lower() == "종료":
-        save_history(global_history)  # Save the history if the keyword "종료" is detected
+        save_history(history)  # Save the history if the keyword "종료" is detected
         return "세션을 저장하고 종료합니다."
 
     # Return the assistant's response
@@ -93,5 +117,7 @@ iface = gr.ChatInterface(
     fn=chatbot_response,
     title="가스라이팅 챗봇",
     description="당신은 가스라이팅을 일삼는 챗봇과 대화하고 있습니다. 아래 예시 중 시작하고자 하는 시나리오를 선택해 주세요. 종료를 원하시면 \"종료\"를 입력하시거나 클릭해 주세요.",
-    examples=[cases[0], cases[1], cases[2], cases[3]]
-).launch(share=True)
+    examples=[[case] for case in cases]
+)
+
+iface.launch()
