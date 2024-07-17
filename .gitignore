@@ -4,6 +4,7 @@
 *.exe
 *.dll
 *.so
+*.pyc
 
 # Ignore build output directories
 build/

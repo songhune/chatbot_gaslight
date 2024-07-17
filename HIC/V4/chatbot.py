@@ -12,6 +12,7 @@ client = OpenAI(api_key=api_key)
 
 # 전역 대화 기록
 global_history = []
+scenario_handler = ScenarioHandler()  # 전역으로 ScenarioHandler 인스턴스 생성
 
 def get_global_history():
     global global_history
@@ -35,7 +36,6 @@ def chatbot_response(response, context={}):
     messages = [{"role": "system", "content": "You are a chatbot."}]
 
     # 상황별 맞춤형 반응 설정
-    scenario_handler = ScenarioHandler()
     scenario_messages = scenario_handler.get_response(history[0]['content'].strip().lower())
 
     if scenario_messages:
