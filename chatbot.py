@@ -36,7 +36,7 @@ def chatbot_response(response, context={}):
     if len(history) == 1:  # 첫 대화일 경우
         messages = scenario_handler.get_response(history[0]['content'].strip().lower())
     else:
-        messages = history
+        messages=history  # 이전 대화 기록 추가
 
     # Generate the assistant's response
     api_response = client.chat.completions.create(
@@ -54,6 +54,8 @@ def chatbot_response(response, context={}):
     assistant_response = api_response.choices[0].message.content
 
     # Append the assistant's response to history
+    if len(history) == 1:  # 첫 대화일 경우
+        history.append(messages[0])
     history.append({"role": "assistant", "content": assistant_response})
     set_global_history(history)  # 업데이트된 기록 설정
 
