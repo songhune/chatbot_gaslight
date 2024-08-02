@@ -4,15 +4,15 @@ import gradio as gr
 import json
 from datetime import datetime
 from dotenv import load_dotenv
-
-# Initialize the OpenAI client
+# 현재 되는 건 이거 정도..! 나머지는 더 공부해야할 듯
+# # Initialize the OpenAI client
 load_dotenv()
 api_key = os.getenv('OPENAI_API_KEY')
 client = OpenAI(api_key=api_key)
 
 class ScenarioHandler:
     def __init__(self):
-        pass
+        self = self
 
     def handle_offender(self):
         return [
@@ -64,7 +64,7 @@ def save_history(history):
 def process_user_input(user_input, chatbot_history):
     if user_input.strip().lower() == "종료":
         save_history(chatbot_history)
-        return chatbot_history, []
+        return chatbot_history + [("종료", "실험에 참가해 주셔서 감사합니다. 후속 지시를 따라주세요")], []
 
     offender_response, _ = chatbot_response(user_input, 'offender', n=1)
     new_history = chatbot_history + [(user_input, offender_response)]
@@ -77,9 +77,10 @@ def handle_user_response(user_input, selected_response, chatbot_history):
     new_history, choices = process_user_input(input_text, chatbot_history)
     
     if input_text.strip().lower() == "종료":
-        return new_history, gr.update(choices=[])
+        return new_history, gr.update(choices=[], interactive=False)
     
     return new_history, gr.update(choices=choices)
+
 
 with gr.Blocks() as demo:
     screen = gr.Chatbot()
