@@ -5,7 +5,7 @@ import json
 from datetime import datetime
 from dotenv import load_dotenv
 # 현재 되는 건 이거 정도..! 나머지는 더 공부해야할 듯
-# # Initialize the OpenAI client
+# Initialize the OpenAI client
 load_dotenv()
 api_key = os.getenv('OPENAI_API_KEY')
 client = OpenAI(api_key=api_key)
